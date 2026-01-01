@@ -12,7 +12,6 @@ import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +22,9 @@ import java.util.Objects;
 public class DeathHandle {
     public static void handle(@NotNull ServerPlayerEntity player) {
         World world = player.getWorld();
+        PlayerInventory items = player.getInventory();
+        if (items.isEmpty()) return;
+
         if (world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
             return;
         }
@@ -31,42 +33,29 @@ public class DeathHandle {
             if (player.getStackInHand(hand).isOf(Items.TOTEM_OF_UNDYING)) return;
         }
 
-        Vec3d deathPos = player.getPos();
-
-        BlockPos skullPos = BlockPos.ofFloored(deathPos.add(0, 0.2, 0));
-
-        PlayerInventory items = player.getInventory();
-        if (items.isEmpty()) return;
-
-        world.setBlockState(skullPos, Blocks.PLAYER_HEAD.getDefaultState(), 3);
-        SkullBlockEntity skullEntity = (SkullBlockEntity) world.getBlockEntity(skullPos);
-
-        if (skullEntity != null) {
-            ProfileComponent playerProfileComponent = new ProfileComponent(player.getGameProfile());
-            skullEntity.setOwner(playerProfileComponent);
-        }
-
-        for (int i = 0; i < items.size(); ++i) {
-            ItemStack itemStack = items.getStack(i);
-            if (!itemStack.isEmpty() && EnchantmentHelper.hasAnyEnchantmentsWith(itemStack, EnchantmentEffectComponentTypes.PREVENT_EQUIPMENT_DROP)) {
-                items.removeStack(i);
-            }
-        }
-
         SimpleInventory inventory = new SimpleInventory(41);
 
-        for (int i = 0; i < items.size(); ++i) {
+        // items without vanishing curse will be added to inventory.
+        for(int i = 0; i < items.size(); ++i) {
             ItemStack itemStack = items.getStack(i);
-            if (!itemStack.isEmpty() && !EnchantmentHelper.hasAnyEnchantmentsWith(itemStack, EnchantmentEffectComponentTypes.PREVENT_ARMOR_CHANGE)) {
+            if (!itemStack.isEmpty() && !EnchantmentHelper.hasAnyEnchantmentsWith(itemStack, EnchantmentEffectComponentTypes.PREVENT_EQUIPMENT_DROP)) {
                 inventory.addStack(itemStack);
             }
         }
         int experience = player.totalExperience / 2;
 
+        items.clear();
         player.experienceLevel = 0;
         player.playerScreenHandler.sendContentUpdates();
-        items.clear();
 
+        // place the skull down
+        BlockPos skullPos = DeathSkullChecker.findSkullPos(player);
+        world.setBlockState(skullPos, Blocks.PLAYER_HEAD.getDefaultState(), 3);
+        SkullBlockEntity skullEntity = (SkullBlockEntity) world.getBlockEntity(skullPos);
+        if (skullEntity != null) {
+            ProfileComponent playerProfileComponent = new ProfileComponent(player.getGameProfile());
+            skullEntity.setOwner(playerProfileComponent);
+        }
         DeathSkullInterface death = ((DeathSkullInterface) Objects.requireNonNull(skullEntity));
         death.deathInfo$set(new DeathInfo(new Date().getTime(), experience, inventory));
         skullEntity.markDirty();
