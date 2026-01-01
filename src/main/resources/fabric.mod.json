@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "deathskull",
+  "version": "${version}",
+  "name": "deathskull",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "top.saltwood.deathskull.Main"
+    ]
+  },
+  "mixins": [
+    "deathskull.mixins.json",
+    {
+      "config": "deathskull.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
