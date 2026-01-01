@@ -4,8 +4,8 @@
   "package": "top.saltwood.deathskull.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinSkullBlockEntity",
-    "MixinPlayerSkullBlock"
+    "MixinPlayerSkullBlock",
+    "MixinSkullBlockEntity"
   ],
   "injectors": {
     "defaultRequire": 1

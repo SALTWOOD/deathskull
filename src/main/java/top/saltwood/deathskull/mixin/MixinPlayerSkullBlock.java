@@ -29,7 +29,7 @@ public abstract class MixinPlayerSkullBlock extends SkullBlock {
             return;
         }
         if (blockEntity instanceof DeathSkullInterface) {
-            DeathInfo deathInfo = ((DeathSkullInterface) blockEntity).getDeathInfo();
+            DeathInfo deathInfo = ((DeathSkullInterface) blockEntity).deathInfo$get();
             if (deathInfo == null) {
                 super.afterBreak(level, player, pos, state, blockEntity, stack);
             } else {

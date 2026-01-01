@@ -68,7 +68,7 @@ public class DeathHandle {
         items.clear();
 
         DeathSkullInterface death = ((DeathSkullInterface) Objects.requireNonNull(skullEntity));
-        death.setDeathInfo(new DeathInfo(new Date().getTime(), experience, inventory));
+        death.deathInfo$set(new DeathInfo(new Date().getTime(), experience, inventory));
         skullEntity.markDirty();
     }
 }

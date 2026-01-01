@@ -18,10 +18,10 @@ public class MixinSkullBlockEntity implements DeathSkullInterface {
     private DeathInfo deathInfo;
 
     @Override
-    public DeathInfo getDeathInfo() { return this.deathInfo; }
+    public DeathInfo deathInfo$get() { return this.deathInfo; }
 
     @Override
-    public void setDeathInfo(DeathInfo info) { this.deathInfo = info; }
+    public void deathInfo$set(DeathInfo info) { this.deathInfo = info; }
 
     @Inject(method = "readNbt", at = @At(value = "RETURN"))
     private void postRead(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup, CallbackInfo ci) {
